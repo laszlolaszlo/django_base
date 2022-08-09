@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,8 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7=iut)*!$!$d4=q2gmr4zscp=0&b6#0h#@xq=#-rbp=f17)j5a'
-
+SECRET_KEY = os.environ.get('SECRET_KEY', 'n)2lmxc_c5---&ppyaa0&^v$!+q-*7eke(_a018-vc99qb9^nv')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -43,8 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third Party
+    'crispy_forms',
+    'crispy_bootstrap5',
     'debug_toolbar',
-
+    'django_select2',
+    
     # Local Apps
     'pages.apps.PagesConfig',
     'accounts.apps.AccountsConfig',
@@ -73,7 +77,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,9 +97,13 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -130,12 +138,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -152,15 +154,46 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.ScryptPasswordHasher',
 ]
 
-# Whitenoise
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Whitenoise and Static files
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Debug Toolbar in Docker
 if DEBUG:
-    import socket  # only if you haven't already imported this
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Cookies
+SESSION_COOKIE_AGE = 7200
+
+# Crsipy
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# LOGIN_REDIRECT_URL = "pages:home"
+# LOGOUT_REDIRECT_URL = "pages:home"
+
+# Email backend for DEV
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+## Email backend for Prod
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# DEFAULT_FROM_EMAIL = str(os.environ.get("DEFAULT_FROM_EMAIL"))
+# EMAIL_HOST = "smtp.sendgrid.net"
+# EMAIL_HOST_USER = "apikey"
+# EMAIL_HOST_PASSWORD = str(os.environ.get("EMAIL_HOST_PASSWORD"))
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+
+# For Prod Environment
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+
