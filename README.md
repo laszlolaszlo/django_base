@@ -33,6 +33,8 @@ services:
 You havew to run **makemigrations** and **migrate** after container starts.  
 
 ```bash
+docker compose -f docker-compose.yaml up -d
 docker compose -f docker-compose.yaml exec web python manage.py makemigrations
 docker compose -f docker-compose.yaml exec web python manage.py migrate
+docker compose -f docker-compose.yaml exec web python manage.py collectstatic
 ```
