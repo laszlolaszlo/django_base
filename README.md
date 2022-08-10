@@ -1,7 +1,7 @@
 # Django 4.0.X based image
 
 This is a Django 4.0.X based image. I made some modifications on default settings.
-- Custom USer Model (accouns app)
+- django-allauth extension
 - Whitenoise static files handling
 - Crispy Forms with BootStrap 5 support
 - Argon2 password hash
