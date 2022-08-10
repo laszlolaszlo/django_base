@@ -38,6 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
 
+    # django-allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    # django-allauth social auth providers (optional)
+    'allauth.socialaccount.providers.apple',
+    'allauth.socialaccount.providers.google',
+
+
     # Whitenoise in DEV environment
     'whitenoise.runserver_nostatic',
 
@@ -51,7 +62,6 @@ INSTALLED_APPS = [
     
     # Local Apps
     'pages.apps.PagesConfig',
-    'accounts.apps.AccountsConfig',
 
 ]
 
@@ -130,7 +140,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'hu'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Europe/Budapest'
 
@@ -167,9 +177,6 @@ if DEBUG:
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
-# Custom User Model
-AUTH_USER_MODEL = 'accounts.CustomUser'
-
 # Cookies
 SESSION_COOKIE_AGE = 7200
 
@@ -197,3 +204,37 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
 
+# django-allauth
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # 'allauth' specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    }, 
+
+    'apple': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    }
+}
